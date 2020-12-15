@@ -1,4 +1,6 @@
 class Solow:
+    def __str__(self):
+        return str(self.params)
     def __init__(self,params):
         """
         Exogenous parameters in Solow growth model:
@@ -11,7 +13,6 @@ class Solow:
 
         """
         self.params = params
-
     def cobb_douglas(self):
         """
         Check if the function is in Cobb-Douglas form
@@ -21,6 +22,7 @@ class Solow:
     def calc_k_star(self):
         """
         Calculate golden rule level of capital
+
         """
         n = self.params['n']
         s = self.params['s']
@@ -47,9 +49,13 @@ class Solow:
         Simulate next capital for time t based on initial value of k
         """
         k = [init_k]
+        k_dot = [0]
+        k_growth = [0]
         for t in range(1,t):
             k.append((self.params['s']*(k[t-1]**self.params['alpha'])+(1-self.params['d'])*k[t-1])/(1+self.params['n']))
-        return k
+            k_dot.append(k[t]-k[t-1])
+            k_growth.append(k_dot[t]/k[t])
+        return k_dot
 
     def cobb_douglas_output(self, k):
         """
@@ -69,6 +75,8 @@ class Solow:
     def equation_of_motion_k(self, k):
         """
         Equation of motion of kapital (k_dot)
+        For small k, sk^alpha > (n+g+delta)k and k_dot > 0
+        For large k, k_dot < 0
         """
         s = self.params['s']
         n = self.params['n']
@@ -89,22 +97,53 @@ class Solow:
         k_dot_d = s * self.marginal_prod_capital(k) - (n + g + delta)
         return k_dot_d
 
+    def update_model(self, p):
+        old_k_star = self.calc_k_star()
+        old_y_star = self.calc_y_star()
+        old_c_star = self.calc_c_star()
+        self.params = p
+        new_k_star = self.calc_k_star()
+        new_y_star = self.calc_y_star()
+        new_c_star = self.calc_c_star()
 
+        new_vals = {
+            "old k star": old_k_star,
+            "old y star": old_y_star,
+            "old c star": old_c_star,
+            "new k star" : new_k_star,
+            "new y star" : new_y_star,
+            "new c star" : new_c_star,
+            "change in k star %": (new_k_star-old_k_star)/old_k_star,
+            "change in k star": new_k_star/ old_k_star,
+            "change in y star": new_y_star / old_y_star,
+            "change in c star": new_c_star / old_c_star,
 
+        }
+        return new_vals
 
-
-
-
-
-# params = {
-#     'n': 0.01,
-#     's': 0.2,
-#     'g': 0.02,
-#     'alpha': 1/3,
-#     'd':0.04
-# }
-# model = Solow(params)
-# print(model.calc_k_star())
+a = []
+params = {
+    'n': 0.01,
+    's': 0.24,
+    'g': 0.01,
+    'alpha': 1/3,
+    'd':0.04
+}
+model = Solow(params)
+print(model.calc_k_star())
 # print(model.predict_k(init_k=6))
-# print(model.calc_y_star())
-# print(model.calc_c_star())
+print(model.calc_y_star())
+print(model.calc_c_star())
+print(model)
+a = model.predict_k(init_k=4,t =10)
+print(a)
+params2 = {
+    'n': 0.01,
+    's': 0.33,
+    'g': 0.01,
+    'alpha': 1/3,
+    'd': 0.04
+}
+print(model.update_model(params2))
+print(model)
+print(model.predict_k(init_k=4,t =10))
