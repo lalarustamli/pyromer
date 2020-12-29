@@ -8,7 +8,10 @@ class Ramsey:
         self.params = params
 
     def get_instant_utility(self):
-        return # will add
+        theta = self.params['theta']
+        C = self.params['C']
+        uti = (C^(1-theta))/(1-theta)
+        return uti
 
     def household_utility(self, Lt, H):
         ro = self.params['ro']

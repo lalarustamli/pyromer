@@ -97,6 +97,15 @@ class Solow:
         k_dot_d = s * self.marginal_prod_capital(k) - (n + g + delta)
         return k_dot_d
 
+    def calculate_convergence(self):
+        n = self.params['n']
+        g = self.params['g']
+        delta = self.params['d']
+        alpha = self.params['alpha']
+        convergence = (1-alpha)*(n+g+delta)
+        return convergence
+
+
     def update_model(self, p):
         old_k_star = self.calc_k_star()
         old_y_star = self.calc_y_star()
@@ -147,3 +156,4 @@ params2 = {
 print(model.update_model(params2))
 print(model)
 print(model.predict_k(init_k=4,t =10))
+print(model.calculate_convergence())
